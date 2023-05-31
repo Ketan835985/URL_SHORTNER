@@ -1,3 +1,16 @@
-const heyman = () => {
-    console.log('just checkout')
-}
+const urlModel = require('../model/urlmodel')
+const router = require('express').Router();
+
+
+
+
+
+
+router.get('/:urlCode', async (req, res) => {
+    const url = await urlModel.findOne({ code: req.params.urlCode })
+    if (url) {
+        res.status(302).redirect(url.longUrl)
+    } else {
+        res.status(404).send('Not found')
+    }
+})
