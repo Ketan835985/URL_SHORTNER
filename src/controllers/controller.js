@@ -10,7 +10,6 @@ const isValidUrl = (urlString) => {
 const createUrlShorten = async (req, res) => {
   try {
     let data = req.body;
-    data.longUrl = data.longUrl.trim();
 
     const dbData = await urlModel
       .findOne({ longUrl: data.longUrl })
@@ -57,7 +56,7 @@ const createUrlShorten = async (req, res) => {
 
 const getUrl = async (req, res) => {
   try {
-    const url = await urlModel.findOne({ code: req.params.urlCode });
+    const url = await urlModel.findOne({ urlCode: req.params.urlCode });
     if (url) {
       res.status(302).redirect(url.longUrl);
     } else {
