@@ -5,6 +5,7 @@ const urlModel = require('../model/urlmodel')
 const createUrlshorten = async (req, res) => {
     try {
         let data = req.body
+        data.longUrl = data.longUrl.trim()
 
         const dbData = await urlModel.findOne({ longUrl: data.longUrl }).select({ _id: 0, longUrl: 1, shortUrl: 1, urlCode: 1 })
 
