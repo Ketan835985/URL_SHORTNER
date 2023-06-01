@@ -1,24 +1,23 @@
-const mongoose =require('mongoose');
-const shortId=require('shortid')
+const mongoose = require('mongoose')
 
-const urlSchema= new mongoose.Schema({
- 
-    urlCode:{
-        type:String,
-        required:true,
-        trim:true
+const urlSchema = new mongoose.Schema(
+    {
+        longUrl: {
+            type: String,
+            required: true
+        },
+        shortUrl: {
+            type: String,
+            required: true,
+            unique: true
+        },
+        urlCode: {
+            type: String,
+            required: true,
+            trim: true
+        }
     },
-    longUrl:{
-        type:String,
-        required:true
-    },
-    shortUrl:{
-        type:String,
-        required:true,
-        unique:true,
-        default:shortId.generate()
-    }
-});
+    { timestamps: true }
+);
 
-module.exports= mongoose.Model('url',urlSchema);
-// model is ready
+module.exports = mongoose.model('url', urlSchema)
