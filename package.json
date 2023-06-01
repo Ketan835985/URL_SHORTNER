@@ -1,13 +1,13 @@
 {
-  "name": "pacakage.json",
+  "name": "short-url",
   "version": "1.0.0",
-  "description": "group proj",
+  "description": "group project short URL",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon index.js"
   },
-  "author": "pksk",
+  "author": "KeTan KaMal PReeTi SauRaBh",
   "license": "ISC",
   "dependencies": {
     "dotenv": "^16.1.1",

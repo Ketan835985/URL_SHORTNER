@@ -40,7 +40,7 @@ const createUrlShorten = async (req, res) => {
           .status(400)
           .send({ status: false, message: "Please, Provide valid URL" });
 
-      data.shortUrl = `http://localhost:3000/${data.urlCode}`;
+      data.shortUrl = `http://localhost:${process.env.PORT}/${data.urlCode}`;
 
       await urlModel.create(data);
       const saveData = await urlModel
@@ -50,7 +50,7 @@ const createUrlShorten = async (req, res) => {
     }
   } catch (error) {
     console.log("controller", error);
-    res.status(500).send({ status: false, message: error });
+    res.status(500).send({ status: false, message: error.message });
   }
 };
 
@@ -61,7 +61,7 @@ const getUrl = async (req, res) => {
     if (url) {
       res.status(302).redirect(url.longUrl);
     } else {
-      res.status(404).send("Not found");
+      res.status(404).send({status: false, message:"Not found"});
     }
   } catch (error) {
     res.status(500).send({ status: false, error: error.message });
