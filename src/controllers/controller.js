@@ -10,6 +10,7 @@ const isValidUrl = (urlString) => {
 const createUrlShorten = async (req, res) => {
   try {
     let data = req.body;
+    data.longUrl = data.longUrl.trim()
 
     const dbData = await urlModel
       .findOne({ longUrl: data.longUrl })
