@@ -7,7 +7,7 @@ const isValidUrl = (urlString) => {
   return urlPattern.test(urlString);
 };
 
-const createUrlshorten = async (req, res) => {
+const createUrlShorten = async (req, res) => {
   try {
     let data = req.body;
     data.longUrl = data.longUrl.trim();
@@ -18,10 +18,10 @@ const createUrlshorten = async (req, res) => {
 
     if (dbData) {
       res.status(201).send({ status: true, data: dbData });
-    } else {
+    }
+    else {
       let shortCode = shortId.generate().toLocaleLowerCase();
       const code = await urlModel.findOne({ urlCode: shortCode });
-
       if (code) {
         shortCode = shortId.generate().toLocaleLowerCase();
       }
@@ -54,4 +54,18 @@ const createUrlshorten = async (req, res) => {
   }
 };
 
-module.exports.createUrlshorten = createUrlshorten;
+
+const getUrl = async (req, res) => {
+  try {
+    const url = await urlModel.findOne({ code: req.params.urlCode });
+    if (url) {
+      res.status(302).redirect(url.longUrl);
+    } else {
+      res.status(404).send("Not found");
+    }
+  } catch (error) {
+    res.status(500).send({ status: false, error: error.message });
+  }
+}
+
+module.exports = { createUrlShorten, getUrl };
