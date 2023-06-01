@@ -1,6 +1,11 @@
-const validUrl = require('valid-url')
+const isUrl = require('is-url')
 const shortId = require('shortid')
 const urlModel = require('../model/urlmodel')
+
+const isValidUrl = urlString => {
+    var urlPattern = new RegExp('(?:https?):\/\/.')
+    return urlPattern.test(urlString);
+}
 
 const createUrlshorten = async (req, res) => {
     try {
@@ -19,12 +24,11 @@ const createUrlshorten = async (req, res) => {
             if (code) {
                 shortCode = shortId.generate().toLocaleLowerCase()
             }
-
             data.urlCode = shortCode
-            const isValid = validUrl.isUri(data.longUrl)
 
             if (!data.longUrl) return res.status(400).send({ status: false, message: "Please, Provide URL" })
-            if (!isValid) return res.status(400).send({ status: false, message: "Please, Provide valid URL" })
+            if (!isValidUrl(data.longUrl)) return res.status(400).send({ status: false, message: "Please, Provide valid URL" })
+            if (!isUrl(data.longUrl)) return res.status(400).send({ status: false, message: "Please, Provide valid URL" })
 
             data.shortUrl = `http://localhost:3000/${data.urlCode}`
 
