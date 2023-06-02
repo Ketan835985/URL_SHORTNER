@@ -76,12 +76,12 @@ const createUrlShorten = async (req, res) => {
 
 const getUrl = async (req, res) => {
   try {
+    const url = await urlModel.findOne({ urlCode: req.params.urlCode });
     const fetchFromRedis = await GET_ASYNC(`${req.params.urlCode}`);
     if (fetchFromRedis) {
       res.status(302).redirect(url.longUrl);
     } 
     else {
-      const url = await urlModel.findOne({ urlCode: req.params.urlCode });
       if (url) {
         await SET_ASYNC(`${req.params.urlCode}`, JSON.stringify(url))
         res.status(302).redirect(url.longUrl);
