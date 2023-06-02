@@ -31,6 +31,7 @@ const createUrlShorten = async (req, res) => {
   try {
     let data = req.body;
     data.longUrl = data.longUrl.trim()
+    // console.log(req.rawHeaders[11])
 
     const dbData = await urlModel
       .findOne({ longUrl: data.longUrl })
@@ -60,7 +61,7 @@ const createUrlShorten = async (req, res) => {
           .status(400)
           .send({ status: false, message: "Please, Provide valid URL" });
 
-      data.shortUrl = `http://localhost:${process.env.PORT}/${data.urlCode}`;
+      data.shortUrl = `${req.rawHeaders[11]}/${data.urlCode}`;
 
       await urlModel.create(data);
       const saveData = await urlModel
