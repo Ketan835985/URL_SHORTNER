@@ -27,6 +27,11 @@ const createUrlShorten = async (req, res) => {
     //   res.status(201).send(fetchFromRedis);
     // }
     // else {
+    
+
+   
+
+
       const dbData = await urlModel
         .findOne({ longUrl: data.longUrl })
         .select({ _id: 0, longUrl: 1, shortUrl: 1, urlCode: 1 });
