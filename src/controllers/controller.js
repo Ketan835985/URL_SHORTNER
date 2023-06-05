@@ -13,9 +13,10 @@ const isValidUrl = (urlString) => {
 // create a new user in the database;-------------------------------------------------------------------
 const createUrlShorten = async (req, res) => {
   try {
-    let data = req.body;
+    const data = req.body;
     data.longUrl = data.longUrl.trim();
-    let longUrl = data.longUrl;
+    const longUrl = data.longUrl;
+
 
     if (!data.longUrl) {
       return res
@@ -32,19 +33,31 @@ const createUrlShorten = async (req, res) => {
       return res
         .status(400)
         .json({ status: false, message: "Please, Provide valid URL" });
+    // finding the data in the cache storage----------------------------------------------------------
+    const caseUrl = await GET_ASYNC(longUrl);
+    //console.log(caseUrl)
+    if (caseUrl) {
+      return res.status(200).json({status:true, data:JSON.parse(caseUrl)});
+    }
+    
+    
     //finding the data into database----------------------------------------------------------------
     const dbData = await urlModel
       .findOne({ longUrl: data.longUrl })
       .select({ _id: 0, longUrl: 1, shortUrl: 1, urlCode: 1 });
     if (dbData) {
+
+    //set the data into the cache memory----------------------------------------------------------
+    await SET_ASYNC(longUrl, JSON.stringify({ shortUrl, urlCode }), "EX", 24 * 60 * 60);
+
       return res.status(200).json({ status: true, data: dbData });
     } else {
       // axios for validations--------------------------------------------------------------------
-      const response = await axios
+     await axios
         .get(longUrl)
         .then(async (response) => {
           //  short id convert into the lower case string-----------------------------------------------
-          let shortCode = shortId.generate().toLowerCase();
+          const shortCode = shortId.generate().toLowerCase();
           const code = await urlModel.findOne({ urlCode: shortCode });
           if (code) {
             shortCode = shortId.generate().toLowerCase();
@@ -56,11 +69,14 @@ const createUrlShorten = async (req, res) => {
           const saveData = await urlModel
             .findOne({ longUrl: data.longUrl })
             .select({ _id: 0, longUrl: 1, shortUrl: 1, urlCode: 1 });
-
+          const {shortUrl,urlCode}=saveData
+        //set the data into the cache memory----------------------------------------------------------  
+          await SET_ASYNC(longUrl, JSON.stringify({ shortUrl, urlCode }), "EX", 24 * 60 * 60);
+         
           return res.status(201).json({ status: true, data: saveData });
         })
         .catch((err) => {
-          
+          console.log(err);
           return res
             .status(400)
             .json({ status: false, data: "url link in invalid" });
@@ -77,7 +93,9 @@ const getUrl = async (req, res) => {
     const fetchFromRedis = await GET_ASYNC(`${req.params.urlCode}`);
    
     if (fetchFromRedis) {
-      res.status(302).redirect(JSON.parse(fetchFromRedis));
+      const varUrl = JSON.parse(fetchFromRedis);
+     // console.log(varUrl);
+      res.status(302).redirect(varUrl.longUrl);
     } else {
       const url = await urlModel.findOne({ urlCode: req.params.urlCode });
       if (url) {
