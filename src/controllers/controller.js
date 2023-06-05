@@ -15,27 +15,22 @@ const createUrlShorten = async (req, res) => {
     let data = req.body;
     data.longUrl = data.longUrl.trim();
     let longUrl = data.longUrl;
-    // console.log(req.rawHeaders[11])
+
     if (!data.longUrl) {
       return res
         .status(400)
         .send({ status: false, message: "Please provide a valid URL" });
     }
-    // const fetchFromRedis = await GET_ASYNC(`${data.longUrl}`);
-    // if (fetchFromRedis) {
-    //   res.status(201).send(fetchFromRedis);
-    // }
-    // else {
 
     let cachedata = await GET_ASYNC(data.longUrl);
     //console.log(cachedata);
     if (cachedata) {
       // if present then send it to user
-      const  caseData  = JSON.parse(cachedata);
+      const caseData = JSON.parse(cachedata);
       return res.status(200).send({
         status: true,
         message: "Already available",
-        caseData 
+        caseData,
       });
     }
 
@@ -43,16 +38,6 @@ const createUrlShorten = async (req, res) => {
       .findOne({ longUrl: data.longUrl })
       .select({ _id: 0, longUrl: 1, shortUrl: 1, urlCode: 1 });
     if (dbData) {
-      // SET_ASYNC(
-      //   urlCode,
-      //   JSON.stringify({ longUrl: saveData.longUrl, shortUrl: saveData.shortUrl }),
-      //   "EX",
-      //   24 * 60 * 60
-      // );
-
-
-
-
       return res.status(201).send({ status: true, data: dbData });
     } else {
       let shortCode = shortId.generate();
@@ -76,31 +61,24 @@ const createUrlShorten = async (req, res) => {
       //console.log("jdkhsdk");
       const response = await axios
         .get(longUrl)
-        .then((response) => {
-                //     // console.log(res);
+        .then(async (response) => {
+          //     // console.log(res);
           data.shortUrl = `http://localhost:3000/${data.urlCode}`;
           let urlCode = data.urlCode;
 
-          urlModel.create(data);
-          const saveData = urlModel
+          await urlModel.create(data);
+          const saveData = await urlModel
             .findOne(data)
             .select({ _id: 0, longUrl: 1, shortUrl: 1, urlCode: 1 });
-          //await SET_ASYNC(`${req.body.longUrl}`,({status: true, data: saveData}))
-          // SET_ASYNC(
-          //   longUrl,
-          //   JSON.stringify({ longUrl: saveData.longUrl, shortUrl: saveData.shortUrl, urlCode:urlCode }),
-          //   "EX",
-          //   24 * 60 * 60
-          // );
 
           return res.status(201).send({ status: true, data: saveData });
         })
         .catch((err) => {
-          return res.status(403).json({ status: false, data: "url link in invalid" });
-         // console.log("link is invalid");
+          console.log(err);
+          return res
+            .status(400)
+            .json({ status: false, data: "url link in invalid" });
         });
-
-
     }
   } catch (error) {
     //console.log("controller", error);
@@ -110,14 +88,19 @@ const createUrlShorten = async (req, res) => {
 
 const getUrl = async (req, res) => {
   try {
-    const url = await urlModel.findOne({ urlCode: req.params.urlCode });
     const fetchFromRedis = await GET_ASYNC(`${req.params.urlCode}`);
-    //console.log("hello",fetchFromRedis);
+    console.log("hello", fetchFromRedis);
     if (fetchFromRedis) {
       res.status(302).redirect(JSON.parse(fetchFromRedis));
     } else {
+      const url = await urlModel.findOne({ urlCode: req.params.urlCode });
       if (url) {
-        await SET_ASYNC(`${req.params.urlCode}`, JSON.stringify(url.longUrl));
+        await SET_ASYNC(
+          `${req.params.urlCode}`,
+          JSON.stringify(url.longUrl),
+          "EX",
+          60 * 60
+        );
         res.status(302).redirect(url.longUrl);
       } else {
         res.status(404).send({ status: false, message: "Not found URL" });
@@ -129,40 +112,3 @@ const getUrl = async (req, res) => {
 };
 
 module.exports = { createUrlShorten, getUrl };
-
-
-
-
-      // await axios
-      //   .get(longUrl)
-      //   .then((res) => {
-      //     // Handle successful response-------------------------------------------------------------
-      //     // console.log(res);
-      //     data.shortUrl = `http://localhost:3000/${data.urlCode}`;
-      //     let urlCode = data.urlCode;
-
-      //     urlModel.create(data);
-      //     const saveData = urlModel
-      //       .findOne(data)
-      //       .select({ _id: 0, longUrl: 1, shortUrl: 1, urlCode: 1 });
-      //     // await SET_ASYNC(`${req.body.longUrl}`,({status: true, data: saveData}))
-      //     SET_ASYNC(
-      //       urlCode,
-      //       JSON.stringify({ longUrl: data.longUrl, shortUrl: data.shortUrl }),
-      //       "EX",
-      //       24 * 60 * 60
-      //     );
-
-      //     return res.status(201).send({ status: true, data: saveData });
-      //   })
-      //   .catch((error) => {
-      //     // Handle error--------------------------------------------------------------------
-      //     console.log(error);
-      //     return res
-      //       .status(error.response.status)
-      //       .json({
-      //         status: false,
-      //         message: "Please, Provide Valid URL",
-      //         chek: error.message,
-      //       });
-      //   });
