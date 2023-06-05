@@ -48,7 +48,7 @@ const createUrlShorten = async (req, res) => {
     if (dbData) {
 
     //set the data into the cache memory----------------------------------------------------------
-    await SET_ASYNC(longUrl, JSON.stringify({ shortUrl, urlCode }), "EX", 24 * 60 * 60);
+    await SET_ASYNC(longUrl, JSON.stringify(dbData), "EX", 24 * 60 * 60);
 
       return res.status(200).json({ status: true, data: dbData });
     } else {
@@ -71,7 +71,7 @@ const createUrlShorten = async (req, res) => {
             .select({ _id: 0, longUrl: 1, shortUrl: 1, urlCode: 1 });
           const {shortUrl,urlCode}=saveData
         //set the data into the cache memory----------------------------------------------------------  
-          await SET_ASYNC(longUrl, JSON.stringify({ shortUrl, urlCode }), "EX", 24 * 60 * 60);
+          await SET_ASYNC(longUrl, JSON.stringify(saveData ), "EX", 24 * 60 * 60);
          
           return res.status(201).json({ status: true, data: saveData });
         })
@@ -95,9 +95,9 @@ const getUrl = async (req, res) => {
     if (fetchFromRedis) {
       const varUrl = JSON.parse(fetchFromRedis);
      // console.log(varUrl);
-      res.status(302).redirect(varUrl.longUrl);
+      res.status(302).redirect(JSON.parse(fetchFromRedis));
     } else {
-      const url = await urlModel.findOne({ urlCode: req.params.urlCode });
+      const url = await urlModel.findOne({ urlCode : req.params.urlCode });
       if (url) {
         await SET_ASYNC(
           `${req.params.urlCode}`,
