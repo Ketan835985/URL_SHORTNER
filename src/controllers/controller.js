@@ -22,11 +22,11 @@ const createUrlShorten = async (req, res) => {
         .send({ status: false, message: "Please provide a valid URL" });
     }
 
-    let cachedata = await GET_ASYNC(data.longUrl);
+    let cacheData = await GET_ASYNC(data.longUrl);
     //console.log(cachedata);
-    if (cachedata) {
+    if (cacheData) {
       // if present then send it to user
-      const caseData = JSON.parse(cachedata);
+      const caseData = JSON.parse(cacheData);
       return res.status(200).send({
         status: true,
         message: "Already available",
