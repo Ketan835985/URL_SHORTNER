@@ -15,6 +15,7 @@ const createUrlShorten = async (req, res) => {
     let data = req.body;
     data.longUrl = data.longUrl.trim();
     let longUrl = data.longUrl;
+    // console.log(req.headers.host) // localhost:3000
 
     if (!data.longUrl) {
       return res
@@ -63,7 +64,7 @@ const createUrlShorten = async (req, res) => {
         .get(longUrl)
         .then(async (response) => {
           //     // console.log(res);
-          data.shortUrl = `http://localhost:3000/${data.urlCode}`;
+          data.shortUrl = `http://${req.headers.host}/${data.urlCode}`;
           let urlCode = data.urlCode;
 
           await urlModel.create(data);
