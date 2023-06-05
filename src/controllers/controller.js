@@ -69,7 +69,6 @@ const createUrlShorten = async (req, res) => {
           const saveData = await urlModel
             .findOne({ longUrl: data.longUrl })
             .select({ _id: 0, longUrl: 1, shortUrl: 1, urlCode: 1 });
-          const {shortUrl,urlCode}=saveData
         //set the data into the cache memory----------------------------------------------------------  
           await SET_ASYNC(longUrl, JSON.stringify(saveData ), "EX", 24 * 60 * 60);
          
@@ -93,8 +92,6 @@ const getUrl = async (req, res) => {
     const fetchFromRedis = await GET_ASYNC(`${req.params.urlCode}`);
    
     if (fetchFromRedis) {
-      const varUrl = JSON.parse(fetchFromRedis);
-     // console.log(varUrl);
       res.status(302).redirect(JSON.parse(fetchFromRedis));
     } else {
       const url = await urlModel.findOne({ urlCode : req.params.urlCode });
@@ -103,11 +100,11 @@ const getUrl = async (req, res) => {
           `${req.params.urlCode}`,
           JSON.stringify(url.longUrl),
           "EX",
-          60 * 60
+          24*60 * 60
         );
         res.status(302).redirect(url.longUrl);
       } else {
-        res.status(404).json({ status: false, message: "Not found URL" });
+        res.status(404).json({ status: false, message: "URL NOT FOUND" });
       }
     }
   } catch (error) {
