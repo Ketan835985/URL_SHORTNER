@@ -14,10 +14,13 @@ const isValidUrl = (urlString) => {
 const createUrlShorten = async (req, res) => {
   try {
     const data = req.body;
+    if(!data.longUrl){
+      return res
+        .status(400)
+        .json({ status: false, message: "Please provide a valid URL" });
+    }
     data.longUrl = data.longUrl.trim();
-    const longUrl = data.longUrl;
-
-
+    const longUrl = data.longUrl
     if (!data.longUrl) {
       return res
         .status(400)
