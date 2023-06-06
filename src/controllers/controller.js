@@ -40,7 +40,7 @@ const createUrlShorten = async (req, res) => {
     const caseUrl = await GET_ASYNC(longUrl);
     //console.log(caseUrl)
     if (caseUrl) {
-      return res.status(200).json({ status: true, data: JSON.parse(caseUrl) });
+      return res.status(201).json({ status: true, data: JSON.parse(caseUrl) });
     }
 
 
@@ -53,7 +53,7 @@ const createUrlShorten = async (req, res) => {
       //set the data into the cache memory----------------------------------------------------------
       await SET_ASYNC(longUrl, JSON.stringify(dbData), "EX", 24 * 60 * 60);
 
-      return res.status(200).json({ status: true, data: dbData });
+      return res.status(201).json({ status: true, data: dbData });
     } else {
       // axios for validations--------------------------------------------------------------------
       await axios
