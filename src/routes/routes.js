@@ -1,5 +1,5 @@
 const express = require("express");
-const { getUrl, createUrlShorten } = require("../controllers/Controller");
+const { getUrl, createUrlShorten } = require("../controllers/controller");
 const router = express.Router();
 
 router.post("/url/shorten", createUrlShorten);
