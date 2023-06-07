@@ -20,12 +20,13 @@ const createUrlShorten = async (req, res) => {
         .json({ status: false, message: "Please provide a valid URL" });
     }
     data.longUrl = data.longUrl.trim();
-    const longUrl = data.longUrl
+    const longUrl = data.longUrl;
     if (!data.longUrl) {
       return res
         .status(400)
         .json({ status: false, message: "Please provide a valid URL" });
     }
+
     if (!isValidUrl(data.longUrl))
       // validation ------------------------------------------
       return res
@@ -43,16 +44,13 @@ const createUrlShorten = async (req, res) => {
       return res.status(201).json({ status: true, data: JSON.parse(caseUrl) });
     }
 
-
     //finding the data into database----------------------------------------------------------------
     const dbData = await urlModel
       .findOne({ longUrl: data.longUrl })
       .select({ _id: 0, longUrl: 1, shortUrl: 1, urlCode: 1 });
     if (dbData) {
-
       //set the data into the cache memory----------------------------------------------------------
       await SET_ASYNC(longUrl, JSON.stringify(dbData), "EX", 24 * 60 * 60);
-
       return res.status(201).json({ status: true, data: dbData });
     } else {
       // axios for validations--------------------------------------------------------------------
@@ -67,6 +65,7 @@ const createUrlShorten = async (req, res) => {
           }
           data.urlCode = shortCode;
           data.shortUrl = `http://${req.headers.host}/${data.urlCode}`;
+
 
           await urlModel.create(data);
           const saveData = await urlModel
