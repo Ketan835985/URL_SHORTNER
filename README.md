@@ -1,101 +1,118 @@
-# Technetium
+# URL Shortener
 
-## Scalable URL Shortner Project Requirement
+URL Shortener is a web application that converts long URLs into shorter, more manageable links. It provides a convenient way to share links, especially on platforms with character limitations or to make lengthy URLs more user-friendly.
 
-## Phase I
+## Description
 
-## Overview
-URL shortening is used to create shorter aliases for long URLs. We call these shortened aliases “short links.” Users are redirected to the original URL when they hit these short links. Short links save a lot of space when displayed, printed, messaged, or tweeted. Additionally, users are less likely to mistype shorter URLs.
+This project aims to build a URL shortener service with the following features:
+
+- Shorten long URLs: Users can input a long URL and receive a shortened version that redirects to the original URL.
+- Customized URLs: Optionally, users can create custom aliases for their shortened URLs to make them more memorable and meaningful.
+- Analytics: The system tracks the number of clicks and provides basic analytics on the usage of shortened URLs.
+- User Registration and Management: Users can create accounts, log in, and manage their shortened URLs. This allows for easy tracking and organization of links.
+
+## Project Requirements
+
+### Phase I
+
+#### Overview
+
+URL shortening is used to create shorter aliases for long URLs. These shortened aliases, known as "short links," redirect users to the original URL when accessed. Short links save space when displayed, printed, messaged, or tweeted, and they reduce the likelihood of mistyping longer URLs.
 
 For example, if we shorten the following URL through TinyURL:
 
+Original URL: https://babeljs.io/blog/2020/10/15/7.12.0#class-static-blocks-12079httpsgithubcombabelbabelpull12079-12143httpsgithubcombabelbabelpull12143
+
+Shortened URL: https://tinyurl.com/y4ned4ep
+
+The shortened URL is nearly one-fifth the size of the original URL.
+
+Some use cases for URL shortening include optimizing links shared across users, easily tracking individual links, and sometimes hiding the affiliated original URLs.
+
+#### Key Points
+
+- Create a group database `groupXDatabase`. You can clean the previously used database and reuse it.
+- Each group should have a single git branch. Coordinate among team members to ensure that every next person pulls the code last pushed by a teammate. The branch name should follow the naming convention `project/urlShortenerGroupX`.
+- Follow the naming conventions exactly as instructed. The backend code will be integrated with the frontend application, meaning any mismatch in the expected request body will result in a failure of successful integration.
+
+#### Models
+
+**Url Model**
+
+```json
+{
+  "urlCode": { "mandatory", "unique", "lowercase", "trim" },
+  "longUrl": { "mandatory", "valid url" },
+  "shortUrl": { "mandatory", "unique" }
+}
 ```
-https://babeljs.io/blog/2020/10/15/7.12.0#class-static-blocks-12079httpsgithubcombabelbabelpull12079-12143httpsgithubcombabelbabelpull12143
-```
 
-We would get:
+#### API Endpoints
 
-```
-https://tinyurl.com/y4ned4ep
-```
+1. **POST /url/shorten**
 
-The shortened URL is nearly one-fifth the size of the actual URL.
+   - Create a short URL for the original URL received in the request body.
+   - The `baseUrl` must be the application's base URL. For example, if the original URL is `http://abc.com/user/images/name/2`, the shortened URL should be `http://localhost:3000/xyz`.
+   - Return the shortened unique URL. Refer to the response structure provided for the expected response.
+   - Ensure the same response is returned for the same original URL every time.
+   - Return HTTP status 400 for an invalid request.
 
-Some of the use cases for URL shortening is to optimise links shared across users, easy tracking of individual links and sometimes hiding the affiliated original URLs.
+2. **GET /:urlCode**
 
-If you haven’t used tinyurl.com before, please try creating a new shortened URL and spend some time going through the various options their service offers. This will help you have a little context to the problem we solve through this project.
+   - Redirect to the original URL corresponding to the `urlCode`.
+   - Use a valid HTTP status code meant for a redirection scenario.
+   - Return a suitable error for a URL not found.
+   - Return HTTP status 400 for an invalid request.
 
-### Key points
-- Create a group database `groupXDatabase`. You can clean the db you previously used and reuse that.
-- This time each group should have a *single git branch*. Coordinate amongst yourselves by ensuring every next person pulls the code last pushed by a team mate. You branch will be checked as part of the demo. Branch name should follow the naming convention `project/urlShortnerGroupX`
-- Follow the naming conventions exactly as instructed. The backend code will be integrated with the front-end application which means any mismatch in the expected request body will lead to failure in successful integration.
+#### Testing
 
-### Models
-- Url Model
-```
-{ urlCode: { mandatory, unique, lowercase, trim }, longUrl: {mandatory, valid url}, shortUrl: {mandatory, unique} }
-```
+To test these APIs, create a new collection in Postman named "Project 2 URL Shortener." Each API should have a new request in this collection, and each request should be named appropriately. Each team member should have their tests in a running state.
 
-### POST /url/shorten
-- Create a short URL for an original url recieved in the request body.
-- The baseUrl must be the application's baseUrl. Example if the originalUrl is http://abc.com/user/images/name/2 then the shortened url should be http://localhost:3000/xyz
-- Return the shortened unique url. Refer [this](#url-shorten-response) for the response
-- Ensure the same response is returned for an original url everytime
-- Return HTTP status 400 for an invalid request
+###
 
-### GET /:urlCode
-- Redirect to the original URL corresponding
-- Use a valid HTTP status code meant for a redirection scenario.
-- Return a suitable error for a url not found
-- Return HTTP status 400 for an invalid request
+ Phase II
 
-## Testing 
-- To test these apis create a new collection in Postman named Project 2 Url Shortner
-- Each api should have a new request in this collection
-- Each request in the collection should be rightly named. Eg  Url shorten, Get Url etc
-- Each member of each team should have their tests in running state
-
-## Phase II
-
-```diff
-+Consider that Twitter has this trend where a famous person with a wide following when posts a link, the link gets frequented in millions within a day.
-
-+So in our application we would want to implement caching so that a newly created link is cached for 24 hours. When a person uses a short url, the long url should be retrieved from cache in the first 24 hours of that url being created.
-
-+- Use caching while fetching the shortened url to minimize db calls.
-+- Implement what makes sense to you and we will build understanding over the assessment of this project. You should understand and should be able to explain the logic that you have implemented.
-```
+- Consider that when a famous person with a wide following posts a link on Twitter, the link gets frequented by millions within a day.
+- Implement caching in our application so that a newly created link is cached for 24 hours. When a person uses a short URL, the long URL should be retrieved from the cache during the first 24 hours after the URL's creation.
+- Use caching while fetching the shortened URL to minimize database calls.
+- Implement logic that makes sense to you, and we will build understanding over the assessment of this project. You should understand and be able to explain the logic you have implemented.
 
 ## Response
 
-### Successful Response structure
-```yaml
+### Successful Response Structure
+
+```json
 {
-  status: true,
-  data: {
+  "status": true,
+  "data": {
 
   }
 }
 ```
-### Error Response structure
-```yaml
+
+### Error Response Structure
+
+```json
 {
-  status: false,
-  message: ""
+  "status": false,
+  "message": ""
 }
 ```
-## Response samples
 
-### Url shorten response
-```yaml
+### Response Samples
+
+**URL Shorten Response**
+
+```json
 {
-  status: true,
+  "status": true,
   "data": {
     "longUrl": "http://www.abc.com/oneofthelongesturlseverseenbyhumans.com",
     "shortUrl": "http://localhost:3000/ghfgfg",
     "urlCode": "ghfgfg"
   } 
 }
-
 ```
+
+Please note that this README document provides an overview of the URL Shortener project requirements and outlines the necessary endpoints and models. Additional implementation details, such as technologies used, installation instructions, and deployment steps, should be added as needed.
 
