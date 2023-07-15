@@ -6,7 +6,7 @@ const axios = require("axios");
 const { response } = require("express");
 
 const isValidUrl = (urlString) => {
-  var urlPattern = new RegExp("(?:https?)://."); // regx to check https method valid---------------------
+  var urlPattern = new RegExp("(?:https?)://."); // regex to check https method valid---------------------
   return urlPattern.test(urlString);
 };
 
@@ -77,7 +77,6 @@ const createUrlShorten = async (req, res) => {
           return res.status(201).json({ status: true, data: saveData });
         })
         .catch((err) => {
-          console.log(err);
           return res
             .status(400)
             .json({ status: false, data: "url link in invalid" });
@@ -114,5 +113,26 @@ const getUrl = async (req, res) => {
   }
   
 };
+const redirectLink= async(req, res)=>{
+  try{
+    const {shortUrl} = req.body;
+    // shortUrl = JSON.stringify(shortUrl)
+    if(!shortUrl){
+      return res
+       .status(400)
+       .json({ status: false, message: "Please provide a valid URL" });
+    }
+    const longUrl = await urlModel.findOne({shortUrl})
+    if (!longUrl) {
+      return res
+       .status(400)
+       .json({ status: false, message: "Please provide a valid URL" });
+    }
+    res.status(200).json(longUrl.longUrl);
+  }
+  catch(error){
+    res.status(500).json({ status: false, error: error.message });
+  }
+}
 
-module.exports = { createUrlShorten, getUrl };
+module.exports = { createUrlShorten, getUrl , redirectLink};
