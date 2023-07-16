@@ -10,10 +10,14 @@ This project aims to build a URL shortener service with the following features:
 - Customized URLs: Optionally, users can create custom aliases for their shortened URLs to make them more memorable and meaningful.
 - Analytics: The system tracks the number of clicks and provides basic analytics on the usage of shortened URLs.
 - User Registration and Management: Users can create accounts, log in, and manage their shortened URLs. This allows for easy tracking and organization of links.
-## [Project DeployMent Link](https://animated-cuchufli-a2e8a1.netlify.app/)
+## Project DeployMent Link
+
+[*Click Here*](https://animated-cuchufli-a2e8a1.netlify.app/)
+
 
 ## Front End Source Code
-[Front End Source Code](https://github.com/Ketan835985/Url-Shortner-FrontEnd.git)
+
+[FrontEnd Source Code](https://github.com/Ketan835985/Url-Shortner-FrontEnd.git)
 
 ## Project Requirements
 
